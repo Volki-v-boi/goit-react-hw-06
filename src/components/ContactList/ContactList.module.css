@@ -1,0 +1,9 @@
+.list {
+  list-style: none;
+  padding: 0;
+}
+
+.listItem {
+  padding: 5px 0;
+  border-bottom: 1px solid #ccc;
+}

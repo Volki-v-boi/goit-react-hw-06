@@ -1,36 +1,64 @@
-// src/components/ContactsForm.jsx
 import { useDispatch } from "react-redux";
 import { addContact } from "../../redux/contactsSlice";
-import { useState } from "react";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import styles from "../ContactsForm/ContactsForm.module.css";
 
 const ContactsForm = () => {
-  const [name, setName] = useState("");
-  const [phone, setPhone] = useState("");
   const dispatch = useDispatch();
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    dispatch(addContact({ id: Date.now().toString(), name, phone }));
-    setName("");
-    setPhone("");
-  };
+  const validationSchema = Yup.object({
+    name: Yup.string().required("Name is required"),
+    phone: Yup.string().required("Phone is required"),
+  });
 
   return (
-    <form onSubmit={handleSubmit}>
-      <input
-        type="text"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
-        placeholder="Name"
-      />
-      <input
-        type="text"
-        value={phone}
-        onChange={(e) => setPhone(e.target.value)}
-        placeholder="Phone"
-      />
-      <button type="submit">Add Contact</button>
-    </form>
+    <Formik
+      initialValues={{ name: "", phone: "" }}
+      validationSchema={validationSchema}
+      onSubmit={(values, { resetForm }) => {
+        dispatch(addContact({ id: Date.now().toString(), ...values }));
+        resetForm();
+      }}
+    >
+      {({ isSubmitting }) => (
+        <Form className={styles.form}>
+          <div className={styles.fieldContainer}>
+            <Field
+              type="text"
+              name="name"
+              className={styles.input}
+              placeholder="Name"
+            />
+            <ErrorMessage
+              name="name"
+              component="div"
+              className={styles.error}
+            />
+          </div>
+          <div className={styles.fieldContainer}>
+            <Field
+              type="text"
+              name="phone"
+              className={styles.input}
+              placeholder="Phone"
+            />
+            <ErrorMessage
+              name="phone"
+              component="div"
+              className={styles.error}
+            />
+          </div>
+          <button
+            className={styles.button}
+            type="submit"
+            disabled={isSubmitting}
+          >
+            Add Contact
+          </button>
+        </Form>
+      )}
+    </Formik>
   );
 };
 
